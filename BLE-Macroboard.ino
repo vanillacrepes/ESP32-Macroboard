@@ -37,10 +37,12 @@ void setup() {
   display.setTextColor(WHITE);
   display.setTextSize(2);
 
-  display.setCursor(20, 10);
+  display.setCursor(0, 0);
   display.println("NERV");
   display.setTextSize(1);
   display.println("God is in his heaven, all is right with the world");
+
+  display.display();
   
   // Set Pin modes
   pinMode(a, INPUT_PULLUP);
@@ -58,15 +60,33 @@ void loop() {
 
   // If a button state is LOW, it's pressed
   if(states[0] == LOW) {
-    Serial.println(0);
+    write();
+    display.println("00 pressed.");
+    display.display();
   }
   if(states[1] == LOW) {
-    Serial.println(1);
+    write();
+    display.println("01 pressed.");
+    display.display();
   }
   if(states[2] == LOW) {
-    Serial.println(2);
+    write();
+    display.println("02 pressed.");
+    display.display();
   }
   if(states[3] == LOW) {
-    Serial.println(3);
+    write();
+    display.println("03 pressed.");
+    display.display();
   }
+}
+
+void write() {
+  display.clearDisplay();
+  display.setTextSize(2);
+
+  display.setCursor(0, 0);
+  display.println("NERV");
+  display.setTextSize(1);
+  display.println("God is in his heaven, all is right with the world");
 }
