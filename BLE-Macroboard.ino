@@ -32,8 +32,8 @@ void setup() {
 
   // Initialize Display
   display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR); //Not even gonna pretend like I know what this does.
-  display.clearDisplay;
-  display.setTextColor(PINK);
+  display.clearDisplay();
+  display.setTextColor(WHITE);
   display.setTextSize(2);
 
   display.setCursor(20, 10);
