@@ -11,10 +11,11 @@
 
 #define OLED_ADDR   0x3C
 Adafruit_SSD1306 display(128, 64, &Wire, -1);
+
 // BLE Keyboard
 #include <BleKeyboard.h>
 
-BleKeyboard bleKeyboard;
+BleKeyboard bleKeyboard("Eph - Lfrith", "vanillacrepes", 100);
 
 // Define threshold to go from short to long press
 #define PRESS_THRESHOLD 500
@@ -98,35 +99,45 @@ void write() {
 }
 
 void detectPress(int b) {
-    // Do nothing if key isn't pressed
-    if(states[b] == HIGH) return;
+  // Do nothing if key isn't pressed
+  if(states[b] == HIGH) return;
 
-    // Check for connection
-    if(bleKeyboard.isConnected()) {
-      if(states[b] == LOW && lStates[b] == HIGH) { // Key has just been pressed
-        // Send assigned keystroke
+  // Check for connection
+  if(bleKeyboard.isConnected()) {
+    if(states[b] == LOW && lStates[b] == HIGH) { // Key has just been pressed
+      // Send assigned keystroke
+      bleKeyboard.write(values[b]);
+      // Record time at press
+      pressedTime[b] = millis();
+
+      // Update OLED
+      write();
+      display.println(String("\nAericht Says: \n0") + String(b) + " pressed.");
+      display.display();
+      
+      // Debug
+      Serial.println("Pressed");
+    }
+
+    if(states[b] == LOW && lStates[b] == LOW) { // Key held
+      // Get current time
+      elapsedTime[b] = millis();
+
+      // Get total time the key has been pressed
+      long pressDuration = elapsedTime[b] - pressedTime[b];
+
+      // If it passes the threshold, spam the shi like in a keyb
+      if(pressDuration > PRESS_THRESHOLD) {
         bleKeyboard.write(values[b]);
-        // Record time at press
-        pressedTime[b] = millis();
-        
+
+        // Update OLED
+        write();
+        display.println(String("\nAericht Says: \n0") + String(b) + " held down.");
+        display.display();
+
         // Debug
-        Serial.println("Pressed");
-      }
-
-      if(states[b] == LOW && lStates[b] == LOW) { // Key held
-        // Get current time
-        elapsedTime[b] = millis();
-
-        // Get total time the key has been pressed
-        long pressDuration = elapsedTime[b] - pressedTime[b];
-
-        // If it passes the threshold, spam the shi like in a keyb
-        if(pressDuration > PRESS_THRESHOLD) {
-          bleKeyboard.write(values[b]);
-
-          // Debug
-          Serial.println("Held");
-        }
+        Serial.println("Held");
       }
     }
+  }
 }
