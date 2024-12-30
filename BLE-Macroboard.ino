@@ -1,9 +1,16 @@
-// Include Packages
+// Shit code writted by yours truly
+
+// Include Packages and Define
 // OLED
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+
+#define OLED_ADDR   0x3C
+Adafruit_SSD1306 display(128, 64, &Wire, -1);
 // BLE Keyboard
 #include <BleKeyboard.h>
+
+BleKeyboard bleKeyboard;
 
 // Pin adresses (Left to right on board)
 int a = 15;
@@ -12,7 +19,7 @@ int c = 4;
 int d = 19;
 
 // Variables
-string states[4] = {"HIGH", "HIGH", "HIGH", "HIGH"};
+int states[4] = {HIGH, HIGH, HIGH, HIGH};
 
 // Run once on awake
 void setup() {
@@ -25,12 +32,13 @@ void setup() {
 
   // Initialize Display
   display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDR); //Not even gonna pretend like I know what this does.
-  display.clearDisplay
+  display.clearDisplay;
   display.setTextColor(PINK);
-  display.textSize(2)
+  display.setTextSize(2);
+
   display.setCursor(20, 10);
   display.println("NERV");
-  display.textSize(1);
+  display.setTextSize(1);
   display.println("God is in his heaven, all is right with the world");
   
   // Set Pin modes
@@ -49,15 +57,15 @@ void loop() {
 
   // If a button state is LOW, it's pressed
   if(states[0] == LOW) {
-    Serial.println(0)
+    Serial.println(0);
   }
   if(states[1] == LOW) {
-    Serial.println(1)
+    Serial.println(1);
   }
   if(states[2] == LOW) {
-    Serial.println(2)
+    Serial.println(2);
   }
   if(states[3] == LOW) {
-    Serial.println(3)
+    Serial.println(3);
   }
 }
