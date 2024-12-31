@@ -21,14 +21,11 @@ BleKeyboard bleKeyboard("Eph - Lfrith", "vanillacrepes", 100);
 #define PRESS_THRESHOLD 500
 
 // Pin adresses (Left to right on board)
-int a = 15;
-int b = 18;
-int c = 4;
-int d = 19;
+int addr[4] = {15, 18, 4, 19};
 
 // Variables
-int lStates[4] = {HIGH, HIGH, HIGH, HIGH};
-int states[4] = {HIGH, HIGH, HIGH, HIGH};
+bool lStates[4] = {HIGH, HIGH, HIGH, HIGH};
+bool states[4] = {HIGH, HIGH, HIGH, HIGH};
 char values[4] = {'a', 'b', 'c', 'd'};
 bool canFire[4] = {1, 1, 1, 1};
 
@@ -62,29 +59,23 @@ void setup() {
   display.display();
   
   // Set Pin modes (PULLUP since they are connected to ground)
-  pinMode(a, INPUT_PULLUP);
-  pinMode(b, INPUT_PULLUP);
-  pinMode(c, INPUT_PULLUP);
-  pinMode(d, INPUT_PULLUP);
+  pinMode(addr[0], INPUT_PULLUP);
+  pinMode(addr[1], INPUT_PULLUP);
+  pinMode(addr[2], INPUT_PULLUP);
+  pinMode(addr[3], INPUT_PULLUP);
 }
 
 void loop() {
-  // Read button states
-  states[0] = digitalRead(a);
-  states[1] = digitalRead(b);
-  states[2] = digitalRead(c);
-  states[3] = digitalRead(d);
+  for(int i = 0; i < 4; i++) {
+    // Read button states
+    states[i] = digitalRead(addr[i]);
 
-  detectPress(0);
-  detectPress(1);
-  detectPress(2);
-  detectPress(3);
+    // Button code
+    detectPress(i);
 
-  // Set last states
-  lStates[0] = states[0];
-  lStates[1] = states[1];
-  lStates[2] = states[2];
-  lStates[3] = states[3];
+    // Set last states
+    lStates[i] = states[i];
+  }
 }
 
 void write() {
