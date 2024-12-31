@@ -1,7 +1,7 @@
 // Shit code written by yours truly
 // ephemera/vanillacrepes.
 
-// Include Packages and Define
+// Include Packages, Define, Initialize
 
 #include <Wire.h>
 
@@ -14,8 +14,12 @@ Adafruit_SSD1306 display(128, 64, &Wire, -1);
 
 // BLE Keyboard
 #include <BleKeyboard.h>
+#include <cstdint>
 
-BleKeyboard bleKeyboard("Eph - Lfrith", "vanillacrepes", 100);
+// Fancy shit yap yap yap I'm bored
+String deviceName = "Lfrith";
+String manufacturerName = "vanillacrepes";
+BleKeyboard bleKeyboard(deviceName.c_str(), manufacturerName.c_str(), 100);
 
 // Define threshold to go from short to long press
 #define PRESS_THRESHOLD 500
@@ -27,7 +31,6 @@ int addr[4] = {15, 18, 4, 19};
 // Variables
 bool lStates[4] = {HIGH, HIGH, HIGH, HIGH};
 bool states[4] = {HIGH, HIGH, HIGH, HIGH};
-char values[4] = {'a', 'b', 'c', 'd'};
 bool canFire[4] = {1, 1, 1, 1};
 
 unsigned long pressedTime[4] = {};
@@ -54,10 +57,7 @@ void setup() {
 
   // Oooooo evangelion reference oooooo
 
-  display.setCursor(0, 0);
-  display.println("NERV");
-  display.setTextSize(1);
-  display.println("God is in his heaven, all is right with the world");
+  write();
 
   display.display();
   
@@ -87,9 +87,9 @@ void write() {
   display.setTextSize(2);
 
   display.setCursor(0, 0);
-  display.println("NERV");
+  display.println(deviceName);
   display.setTextSize(1);
-  display.println("God is in his heaven, all is right with the world");
+  display.println("Manufactured by: \n" + manufacturerName + ".");
 }
 
 void detectPress(int b) {
@@ -103,13 +103,13 @@ void detectPress(int b) {
   if(bleKeyboard.isConnected()) {
     if(states[b] == LOW && lStates[b] == HIGH) { // Key has just been pressed
       // Send assigned keystroke
-      bleKeyboard.write(values[b]);
+      keyFn(b);
       // Record time at press
       pressedTime[b] = millis();
 
       // Update OLED
       write();
-      display.println(String("\nAericht: \n0") + String(b) + " pressed.");
+      display.println(String("\n//Log: \n0") + String(b) + " pressed.");
       display.display();
 
       // Reset debounce time
@@ -123,13 +123,13 @@ void detectPress(int b) {
       // Get total time the key has been pressed
       long pressDuration = elapsedTime[b] - pressedTime[b];
 
-      // If it passes the threshold, spam the shi like in a keyb
+      // If it passes the threshold, spam that shi like keybor
       if(pressDuration > PRESS_THRESHOLD) {
-        bleKeyboard.write(values[b]);
+        keyFn(b);
 
         // Update OLED
         write();
-        display.println(String("\nAericht: \n0") + String(b) + " held down.");
+        display.println(String("\n//Log: \n0") + String(b) + " held down.");
         display.display();
       }
 
@@ -137,4 +137,12 @@ void detectPress(int b) {
       lastDebounceTimes[b] = millis();
     }
   }
+}
+
+// Not the best way to go about this.
+void keyFn(int t) {
+  if(t == 0) bleKeyboard.write(KEY_MEDIA_VOLUME_DOWN);
+  if(t == 1) bleKeyboard.write(KEY_MEDIA_VOLUME_UP);
+  if(t == 2) bleKeyboard.write(KEY_MEDIA_PLAY_PAUSE);
+  if(t == 3) bleKeyboard.write(KEY_MEDIA_NEXT_TRACK);
 }
