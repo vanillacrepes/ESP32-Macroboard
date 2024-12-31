@@ -19,6 +19,7 @@ BleKeyboard bleKeyboard("Eph - Lfrith", "vanillacrepes", 100);
 
 // Define threshold to go from short to long press
 #define PRESS_THRESHOLD 500
+#define DEBOUNCE_TIME 50
 
 // Pin adresses (Left to right on board)
 int addr[4] = {15, 18, 4, 19};
@@ -31,6 +32,8 @@ bool canFire[4] = {1, 1, 1, 1};
 
 unsigned long pressedTime[4] = {};
 unsigned long elapsedTime[4] = {};
+
+unsigned long lastDebounceTimes[4] = {};
 
 // Run once on awake
 void setup() {
@@ -93,6 +96,9 @@ void detectPress(int b) {
   // Do nothing if key isn't pressed
   if(states[b] == HIGH) return;
 
+  // Do nothing if debounce time hasn't elapsed
+  if(millis() - lastDebounceTimes[b] < DEBOUNCE_TIME) return;
+
   // Check for connection
   if(bleKeyboard.isConnected()) {
     if(states[b] == LOW && lStates[b] == HIGH) { // Key has just been pressed
@@ -103,11 +109,11 @@ void detectPress(int b) {
 
       // Update OLED
       write();
-      display.println(String("\nAericht Says: \n0") + String(b) + " pressed.");
+      display.println(String("\nAericht: \n0") + String(b) + " pressed.");
       display.display();
-      
-      // Debug
-      Serial.println("Pressed");
+
+      // Reset debounce time
+      lastDebounceTimes[b] = millis();
     }
 
     if(states[b] == LOW && lStates[b] == LOW) { // Key held
@@ -123,12 +129,12 @@ void detectPress(int b) {
 
         // Update OLED
         write();
-        display.println(String("\nAericht Says: \n0") + String(b) + " held down.");
+        display.println(String("\nAericht: \n0") + String(b) + " held down.");
         display.display();
-
-        // Debug
-        Serial.println("Held");
       }
+
+      // Reset debounce time
+      lastDebounceTimes[b] = millis();
     }
   }
 }
